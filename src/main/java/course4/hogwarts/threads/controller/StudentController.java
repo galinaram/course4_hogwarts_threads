@@ -12,6 +12,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @RestController
 @RequestMapping("students")
@@ -89,5 +91,62 @@ public class StudentController {
     @GetMapping("/last-five")
     public List<Student> getLastFiveStudents() {
         return studentService.getLastFiveStudents();
+    }
+
+    @GetMapping("/print-parallel")
+    public void getStudentsParallel() {
+        for (int i = 0; i < 2 && i < studentService.getAllStudents().size(); i++) {
+            System.out.println(studentService.findStudent(i).getName());
+        }
+
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+
+        executor.submit(() -> {
+            for (int i = 2; i < 4 && i < studentService.getAllStudents().size(); i++) {
+                System.out.println(studentService.findStudent(i).getName());
+            }
+        });
+
+        executor.submit(() -> {
+            for (int i = 4; i < 6 && i < studentService.getAllStudents().size(); i++) {
+                System.out.println(studentService.findStudent(i).getName());
+            }
+        });
+
+        executor.shutdown();
+    }
+    @GetMapping("/print-synchronized")
+    public void getStudentsSynchronized() {
+        printStudentName(0);
+        printStudentName(1);
+
+        for (int i = 0; i < 2 && i < studentService.getAllStudents().size(); i++) {
+            printStudentName(i);
+        }
+
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+
+        executor.submit(() -> {
+            for (int i = 2; i < 4 && i < studentService.getAllStudents().size(); i++) {
+                printStudentName(i);
+            }
+        });
+
+        executor.submit(() -> {
+            for (int i = 4; i < 6 && i < studentService.getAllStudents().size(); i++) {
+                printStudentName(i);
+            }
+        });
+
+        executor.shutdown();
+    }
+
+    private void printStudentName(int index) {
+        synchronized (StudentService.class){
+            if (index < studentService.getAllStudents().size()) {
+                String name = studentService.findStudent(index).getName();
+                System.out.println(name);
+            }
+        }
     }
 }
