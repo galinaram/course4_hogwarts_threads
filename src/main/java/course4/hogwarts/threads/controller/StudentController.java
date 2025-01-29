@@ -116,25 +116,37 @@ public class StudentController {
         executor.shutdown();
     }
     @GetMapping("/print-synchronized")
-    public synchronized void getStudentsSynchronized() {
+    public void getStudentsSynchronized() {
+        printStudentName(0);
+        printStudentName(1);
+
         for (int i = 0; i < 2 && i < studentService.getAllStudents().size(); i++) {
-            System.out.println(studentService.findStudent(i).getName());
+            printStudentName(i);
         }
 
         ExecutorService executor = Executors.newFixedThreadPool(2);
 
         executor.submit(() -> {
             for (int i = 2; i < 4 && i < studentService.getAllStudents().size(); i++) {
-                System.out.println(studentService.findStudent(i).getName());
+                printStudentName(i);
             }
         });
 
         executor.submit(() -> {
             for (int i = 4; i < 6 && i < studentService.getAllStudents().size(); i++) {
-                System.out.println(studentService.findStudent(i).getName());
+                printStudentName(i);
             }
         });
 
         executor.shutdown();
+    }
+
+    private void printStudentName(int index) {
+        synchronized (StudentService.class){
+            if (index < studentService.getAllStudents().size()) {
+                String name = studentService.findStudent(index).getName();
+                System.out.println(name);
+            }
+        }
     }
 }
