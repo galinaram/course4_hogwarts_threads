@@ -6,9 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import javax.management.Query;
 import java.awt.print.Pageable;
 import java.util.Collection;
 import java.util.List;
+import java.util.Queue;
 
 @Service
 public class StudentService {
@@ -30,6 +32,9 @@ public class StudentService {
     }
     public Collection<Student> getAllStudents(){
         return studentRepository.findAll();
+    }
+    public Queue<Student> getStudentsQueue() {
+        return (Queue<Student>) studentRepository.findAll();
     }
 
     public Collection<Student> findByAgeBetween(Long min, Long max){
