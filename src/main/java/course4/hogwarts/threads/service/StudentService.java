@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import javax.management.Query;
 import java.awt.print.Pageable;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
@@ -34,7 +35,9 @@ public class StudentService {
         return studentRepository.findAll();
     }
     public Queue<Student> getStudentsQueue() {
-        return (Queue<Student>) studentRepository.findAll();
+        List<Student> students = studentRepository.findAll();
+        Queue<Student> studentQueue = new LinkedList<>(students);
+        return studentQueue;
     }
 
     public Collection<Student> findByAgeBetween(Long min, Long max){
